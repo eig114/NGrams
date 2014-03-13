@@ -16,6 +16,7 @@ namespace NGrams
         {
                 private const string DefaultMatchPattern = @"^\p{L}+$";
                 private const int DefaultNGramLength = 3;
+                
                 private string _matchPattern;
                 private string _fileName;
                 private int _ngramLength;
