@@ -97,7 +97,6 @@ namespace NGrams
                         decimal freq2, 
                         decimal freqNorm)
                 {
-                        // страшная формула.
                         decimal x = 2 * (freq1 - freq2) / (freq1 + freq2);
                         x *= x;
                         
