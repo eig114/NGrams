@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using NGrams;
+using NGrams.Extensions;
 
 namespace NGrams
 {
@@ -11,18 +12,20 @@ namespace NGrams
         {
                 private const int DefaultNgramLength = 3;
                 private const int DefaultTopN = 3;
+                
                 /// <summary>
                 /// The entry point of the program, where the program control starts and ends.
                 /// </summary>
                 /// <param name='args'>
-                /// Параметры командной строки. Запускается так: "ngrams ИМЯ_ФАЙЛА [длина N-грам]"
+                /// Параметры командной строки. Запускается так: "ngrams [имя файла или параметр]*"
+                /// параметры: --n=VALUE - длина н-граммы, --top=VALUE кол-во отображаемых н-грам на файл
                 /// </param>
                 public static void Main(string[] args)
                 {
                         int ngramLength = DefaultNgramLength;
                         int topN = DefaultTopN;
                         
-                        Dictionary<string,NgramGetter> ngramGetters = new Dictionary<string,NgramGetter>();
+                        List<NgramGetter> ngramGetters = new List<NgramGetter> ();
                         foreach (string arg in args) {
                                 if (arg.StartsWith ("--n=")) {
                                         if (!Int32.TryParse (arg.Substring (4), out ngramLength)) {
@@ -39,13 +42,13 @@ namespace NGrams
                                         else {
                                                 string fileName = extendHome (arg);
                                                 Console.WriteLine (fileName);
-                                                ngramGetters.Add (fileName, new NgramGetter (fileName, ngramLength));
+                                                ngramGetters.Add (new NgramGetter (fileName, ngramLength));
                                         }
                         }
                         
                         foreach (var ngramInfo in ngramGetters) {
-                                Console.Write (String.Format ("Top 3 for {0}:\n", ngramInfo.Key));
-                                var top = ngramInfo.Value.NGramProbability.OrderByDescending (x => x.Value).Take (topN).ToArray ();
+                                Console.Write (String.Format ("Top 3 for {0}:\n", ngramInfo.FileName));
+                                var top = ngramInfo.NGramProbability.OrderByDescending (x => x.Value).Take (topN).ToArray ();
                                 foreach (var ngram in top) {
                                         Console.WriteLine (ngram);
                                 }
