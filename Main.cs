@@ -47,35 +47,12 @@ namespace NGrams
                         }
                         
                         foreach (var ngramInfo in ngramGetters) {
-                                Console.Write (String.Format ("Top 3 for {0}:\n", ngramInfo.FileName));
+                                Console.Write ("Top {0} for {1}:\n", topN, ngramInfo.FileName);
                                 var top = ngramInfo.NGramProbability.OrderByDescending (x => x.Value).Take (topN).ToArray ();
                                 foreach (var ngram in top) {
                                         Console.WriteLine (ngram);
                                 }
                         }
-                        
-                        /*if (args.Any ()) {
-                                Console.Write (args [0]);
-                                fileName = extendHome (args [0]);
-                        }
-                        else {
-                                fileName = extendHome (Console.ReadLine ());
-                        }
-                        
-                        if (args.Length > 1 && int.TryParse (args [1], out ngramLength)) {
-                                ngrams = new NgramGetter (fileName, ngramLength);
-                        }
-                        else {
-                                ngrams = new NgramGetter (fileName);
-                        }
-                 
-                        var ngramCollection = ngrams.NGramProbability;
-                 
-                        foreach (var ngram in ngramCollection.OrderBy(x=> x.Value)) {
-                                Console.WriteLine (String.Format ("{0}\t{1}", 
-                                                         ngram.Key,
-                                                         ngram.Value));
-                        }*/
                 } 
                                
                 /// <summary>

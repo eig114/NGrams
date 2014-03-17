@@ -16,30 +16,29 @@ namespace NGrams
         {
                 private const string DefaultMatchPattern = @"^\p{L}+$";
                 private const int DefaultNGramLength = 3;
-                
                 private string _matchPattern;
                 private string _fileName;
                 private int _ngramLength;
          
-                public NgramGetter (string fileName, int ngramLength, string matchPattern)
+                public NgramGetter(string fileName, int ngramLength, string matchPattern)
                 {
                         _matchPattern = matchPattern;
                         _ngramLength = ngramLength;
                         _fileName = fileName;
-                        ParseFile(fileName, ngramLength);
+                        ParseFile (fileName, ngramLength);
                 }
          
-                public NgramGetter (string fileName, int ngramLength)
+                public NgramGetter(string fileName, int ngramLength)
                  :this(fileName,ngramLength,DefaultMatchPattern)
                 {
                 }
                 
-                public NgramGetter (string fileName, string matchPattern)
+                public NgramGetter(string fileName, string matchPattern)
                  :this(fileName,DefaultNGramLength,matchPattern)
                 {
                 }
          
-                public NgramGetter (string fileName)
+                public NgramGetter(string fileName)
                  :this(fileName,DefaultNGramLength,DefaultMatchPattern)
                 {
                 }
@@ -51,7 +50,7 @@ namespace NGrams
                         get { return _fileName;}
                         private set {
                                 _fileName = value;
-                                ParseFile(_fileName, N);
+                                ParseFile (_fileName, N);
                         }
                 }
          
@@ -62,7 +61,7 @@ namespace NGrams
                         get { return _ngramLength;} 
                         private set {
                                 _ngramLength = value;
-                                ParseFile(_fileName, _ngramLength);
+                                ParseFile (_fileName, _ngramLength);
                         }
                 }
          
@@ -76,7 +75,7 @@ namespace NGrams
                         get{ return _matchPattern;}
                         private set {
                                 _matchPattern = value;
-                                ParseFile(_fileName, _ngramLength);
+                                ParseFile (_fileName, _ngramLength);
                         }
                 }
          
@@ -97,57 +96,41 @@ namespace NGrams
                 /// <param name='fileName'>
                 /// File name.
                 /// </param>
-                private void ParseFile (string fileName, int ngramLength)
+                private void ParseFile(string fileName, int ngramLength)
                 {
-                        Dictionary<string,int> ngrams = new Dictionary<string, int>();
-                 
+                        Dictionary<string,int> ngrams = new Dictionary<string, int> ();
+                        Queue<char> charQueue = new Queue<char> (_ngramLength);
+                        
                         using (StreamReader reader = new StreamReader(fileName,Encoding.UTF8)) {
-                                while (!reader.EndOfStream && reader.BaseStream.CanRead)
-                                        ngrams.AddOrUpdate(GetNextNGram(reader, ngramLength),
-                                                    1,
-                                                    (key,val) => val + 1);
-                        }
-                 
-                        NGramRawOccurencies = ngrams;
-                        int totalChars = NGramRawOccurencies.Sum(x => x.Value);
-                        NGramProbability = NGramRawOccurencies
-                                .Select(x => new {
-                                        Key = x.Key,
-                                        Value = Decimal.Divide(x.Value, totalChars)})
-                                 .ToDictionary(x => x.Key, y => y.Value);
-                }
-         
-                /// <summary>
-                ///      Получает следующую N-грамму из потока, 
-                ///      читаемого <paramref name='reader'/>
-                /// </summary>
-                /// <returns>
-                ///      Следующая N-грамму из потока. Если файл закончился раньше, 
-                ///      чем N было достигнуто, возвращается неполная N-грамма.
-                /// </returns>
-                /// <param name='reader'>
-                ///      Reader.
-                /// </param>
-                /// <param name='ngramSize'>
-                ///      Ngram size.
-                /// </param>
-                private string GetNextNGram (StreamReader reader, int ngramSize)
-                {
-                        StringBuilder tmpBuilder = new StringBuilder();
-                        int readResult;
-                        while ((readResult = reader.Read()) != -1 && // BaseStream.CanRead &&
-                        tmpBuilder.Length < ngramSize) {
-                                char c = (char)readResult;
-                                //bool ismatch = Regex.IsMatch(c.ToString(), @"^\p{L}+$");
-                                //if (!_charsToStrip.Contains(c)) {
-                                if (Regex.IsMatch(c.ToString(), _matchPattern)) {
-                                        tmpBuilder.Append(Char.ToUpper(c));
+                                while (!reader.EndOfStream && reader.BaseStream.CanRead) {
+                                        FillQueue (charQueue, reader);
+                                        ngrams.AddOrUpdate (new string (charQueue.ToArray ()),
+                                                           1,
+                                                           (key,val) => val + 1);
+                                        charQueue.Dequeue ();
+                                        
                                 }
                         }
                  
-                        return tmpBuilder.ToString();
+                        NGramRawOccurencies = ngrams;
+                        int totalChars = NGramRawOccurencies.Sum (x => x.Value);
+                        NGramProbability = NGramRawOccurencies
+                                .Select (x => new {
+                                        Key = x.Key,
+                                        Value = Decimal.Divide (x.Value, totalChars)})
+                                 .ToDictionary (x => x.Key, y => y.Value);
                 }
-         
+                
+                private void FillQueue(Queue<char> queue, StreamReader reader)
+                {
+                        int readResult;
+                        while (queue.Count < _ngramLength && (readResult = reader.Read()) != -1) {
+                                char c = (char)readResult;
+                                if (Regex.IsMatch (c.ToString (), _matchPattern)) {
+                                        queue.Enqueue (Char.ToUpper (c));
+                                }
+                        }
+                }
          
         }
 }

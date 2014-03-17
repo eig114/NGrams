@@ -5,7 +5,7 @@ namespace NGrams.Extensions
 {
         public static class IDictionaryExtensions
         {
-                public static void AddOrUpdate<TKey, TValue> (this IDictionary<TKey,TValue> dict,
+                public static void AddOrUpdate<TKey, TValue>(this IDictionary<TKey,TValue> dict,
                                                      TKey key,
                                                      TValue newValue,
                                                      Func<TKey, TValue, TValue> updater)

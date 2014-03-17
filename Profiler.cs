@@ -13,7 +13,30 @@ namespace NGrams
         /// </summary>
         public static class Profiler
         {
-                 /// <summary>
+                public static IDictionary<string,decimal> MergeNGramData(IEnumerable<IDictionary<string,int>> ngramData)
+                {
+                        int totalOccurencies = ngramData.Sum (x => x.Sum (y => y.Value));
+                        Dictionary<string,decimal> mergedData = new Dictionary<string, decimal> ();
+                        
+                        foreach (var ngrams in ngramData) {
+                                
+                                foreach (var ngram in ngrams) {
+                                        mergedData.AddOrUpdate (
+                                        ngram.Key,
+                                        ngram.Value,
+                                        (key,val) => val + ngram.Value);
+                                }
+                        }
+                        
+                        return mergedData
+                                .Select (x => new {
+                                        Key = x.Key,
+                                        Value = Decimal.Divide (x.Value, totalOccurencies)})
+                                 .ToDictionary (x => x.Key, y => y.Value);
+                        ;
+                }
+                
+                /// <summary>
                 /// Получает вектор средних частот  n-грам
                 /// </summary>
                 /// <returns>
@@ -24,7 +47,7 @@ namespace NGrams
                 /// </param>
                 public static IDictionary<string,decimal> GetNormalVector(IEnumerable<IDictionary<string,decimal>> profiles)
                 {
-                        IDictionary<string,Tuple<decimal,decimal>> ngramSumsAndCounts;
+                        IDictionary<string,Tuple<decimal,decimal>> ngramSumsAndCounts = new Dictionary<string, Tuple<decimal, decimal>> ();
                         foreach (var profile in profiles) {
                                 foreach (var ngram in profile) {
                                         ngramSumsAndCounts.AddOrUpdate (
