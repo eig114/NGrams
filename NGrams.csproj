@@ -52,12 +52,14 @@
     <MonoDevelop>
       <Properties>
         <Policies>
-          <DotNetNamingPolicy DirectoryNamespaceAssociation="PrefixedFlat" ResourceNamePolicy="MSBuild" />
-          <TextStylePolicy TabWidth="8" NoTabsAfterNonTabs="True" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
-          <CSharpFormattingPolicy AlignEmbeddedUsingStatements="False" AlignEmbeddedIfStatements="False" AnonymousMethodBraceStyle="EndOfLineWithoutSpace" IfElseBraceForcement="AddBraces" ForBraceForcement="AddBraces" WhileBraceForcement="AddBraces" UsingBraceForcement="AddBraces" FixedBraceForcement="AddBraces" PlaceElseOnNewLine="True" PlaceCatchOnNewLine="True" PlaceFinallyOnNewLine="True" PlaceWhileOnNewLine="True" BeforeMethodDeclarationParentheses="False" BeforeConstructorDeclarationParentheses="False" BeforeIndexerDeclarationBracket="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
-          <TextStylePolicy inheritsSet="Mono" inheritsScope="text/plain" scope="text/plain" />
+          <DotNetNamingPolicy DirectoryNamespaceAssociation="PrefixedHierarchical" ResourceNamePolicy="MSBuild" />
+          <TextStylePolicy NoTabsAfterNonTabs="True" RemoveTrailingWhitespace="True" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
+          <CSharpFormattingPolicy PlaceElseOnNewLine="True" PlaceCatchOnNewLine="True" PlaceFinallyOnNewLine="True" BeforeMethodCallParentheses="False" BeforeIndexerDeclarationBracket="False" NewParentheses="False" SpacesBeforeBrackets="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+          <TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/plain" />
           <VersionControlPolicy inheritsSet="Mono" />
-          <ChangeLogPolicy UpdateMode="ProjectRoot" inheritsSet="Mono" />
+          <ChangeLogPolicy inheritsSet="Mono" />
+          <TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="application/xml" />
+          <XmlFormattingPolicy inheritsSet="Mono" inheritsScope="application/xml" scope="application/xml" />
         </Policies>
       </Properties>
     </MonoDevelop>

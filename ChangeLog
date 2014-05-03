@@ -1,3 +1,11 @@
+2014-05-03  eig  <eig114@gmail.com>
+
+	* Main.cs:
+	* Profiler.cs:
+	* NGrams.pidb:
+	* NGrams.csproj:
+	* NgramGetter.cs: 
+
 2014-03-17  eig  <eig114@gmail.com>
 
 	* IDictionaryExtensions.cs: 
