@@ -1,5 +1,16 @@
 2014-05-03  eig  <eig114@gmail.com>
 
+	* Profile.cs: Расширение NgramGetter. Профилирует автора по
+	  нескольким файлам
+
+	* Main.cs:
+	* NGrams.csproj: 
+
+	* NgramGetter.cs: Удаление за ненаадобностью. Перенос
+	  функционала в класс Profile
+
+2014-05-03  eig  <eig114@gmail.com>
+
 	* Main.cs:
 	* Profiler.cs:
 	* NGrams.pidb:

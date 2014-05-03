@@ -43,9 +43,10 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="NgramGetter.cs" />
     <Compile Include="Extensions\IDictionaryExtensions.cs" />
     <Compile Include="Profiler.cs" />
+    <Compile Include="Profile.cs" />
+    <Compile Include="Extensions\ICollectionExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

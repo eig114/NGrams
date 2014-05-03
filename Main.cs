@@ -25,7 +25,8 @@ namespace NGrams
             int ngramLength = DefaultNgramLength;
             int topN = DefaultTopN;
                         
-            List<NgramGetter> ngramGetters = new List<NgramGetter>();
+            List<Profile> profiles = new List<Profile>();
+
             foreach (string arg in args) {
                 if (arg.StartsWith("--n=")) {
                     if (!Int32.TryParse(arg.Substring(4), out ngramLength)) {
@@ -42,34 +43,23 @@ namespace NGrams
                 else {
                     string fileName = extendHome(arg);
                     Console.WriteLine(fileName);
-                    ngramGetters.Add(new NgramGetter(fileName, ngramLength));
+
+                    Profile newProfile=new Profile(ngramLength);
+                    newProfile.AddFile(fileName);
+                    profiles.Add(newProfile);
+                }
+            }
+
+            foreach(var profile in profiles){
+                var topOccurencies = profile.NGramRawOccurencies.OrderByDescending(x=> x.Value).Take(topN);
+
+                foreach (var ngram in topOccurencies){
+                    Console.WriteLine(ngram);
                 }
             }
                         
-            if (topN > 0) {
-                foreach (var ngramInfo in ngramGetters) {
-                    Console.Write("Top {0} for {1}:\n", topN, ngramInfo.FileName);
-                    var top = ngramInfo.NGramProbability.OrderByDescending(x => x.Value).Take(topN).ToArray();
-                    foreach (var ngram in top) {
-                        Console.WriteLine(ngram);
-                    }
-                }
-            }
-                        
-            var normVector = Profiler.GetNormalVector(ngramGetters.Select(x => x.NGramProbability));
-            var unknownData = ngramGetters.First().NGramProbability;
-                        
-            Dictionary<string,double> distances = new Dictionary<string, double>();
-            foreach (var candidate in ngramGetters.Skip(1)) {
-                var second = candidate.NGramProbability;
-                var distance = Profiler.GetDistanceVector(unknownData, second, normVector);
-                distances.Add(candidate.FileName, Profiler.GetVectorLength(distance.Values));
-            }
-                        
-            foreach (var candidate in distances.OrderBy(x=> x.Value)) {
-                Console.WriteLine(candidate);
-            }
-        } 
+
+        }
                                
         /// <summary>
         ///     Разворачивает символ '~' в путь к домашней директории на UNIX'ах
@@ -83,9 +73,11 @@ namespace NGrams
         private static string extendHome (string input)
         {
             OperatingSystem os = Environment.OSVersion;
-                        
+
             if (os.Platform == PlatformID.Unix) {
+#if DEBUG
                 System.Diagnostics.Debug.WriteLine(@"I smell a penguin! Or is it an imp?...");
+#endif
                 return input.Replace("~", System.Environment.GetEnvironmentVariable("$HOME"));
             }
             return input;

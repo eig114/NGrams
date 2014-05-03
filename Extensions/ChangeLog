@@ -1,4 +1,8 @@
 2014-05-03  eig  <eig114@gmail.com>
 
+	* ICollectionExtensions.cs: Метод AddRange
+
+2014-05-03  eig  <eig114@gmail.com>
+
 	* IDictionaryExtensions.cs: 
 
