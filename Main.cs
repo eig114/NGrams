@@ -20,6 +20,7 @@ namespace NGrams
         /// <param name='args'>
         /// Параметры командной строки. Запускается так: "ngrams [имя файла или параметр]*"
         /// параметры: --n=VALUE - длина н-граммы, --top=VALUE кол-во отображаемых н-грам на файл
+        /// --target=TARGETNAME - имя файла с неизвестным текстом
         /// </param>
         public static void Main (string[] args)
         {

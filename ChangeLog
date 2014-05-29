@@ -1,5 +1,10 @@
 2014-05-29  eig  <eig114@gmail.com>
 
+	* Main.cs:
+	* README.md: 
+
+2014-05-29  eig  <eig114@gmail.com>
+
 	* ProfileExtensions.cs: Перенос и расширение функционала
 	  класса Profiler. 
 
