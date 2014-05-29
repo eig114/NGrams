@@ -5,6 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using NGrams;
 using NGrams.Extensions;
+using System.Diagnostics;
 
 namespace NGrams
 {
@@ -25,7 +26,8 @@ namespace NGrams
             int ngramLength = DefaultNgramLength;
             int topN = DefaultTopN;
                         
-            List<Profile> profiles = new List<Profile>();
+            var profiles = new Dictionary<string,Profile>();
+            Profile unknownText=null;
 
             foreach (string arg in args) {
                 if (arg.StartsWith("--n=")) {
@@ -40,24 +42,58 @@ namespace NGrams
                         topN = DefaultTopN;
                     }
                 }
+                else if (arg.StartsWith("--target=")){
+                    string fileName=arg.Substring(9);
+                    unknownText=new Profile(ngramLength, "unknown");
+                    unknownText.AddFile(fileName);
+                }
                 else {
                     string fileName = extendHome(arg);
-                    Console.WriteLine(fileName);
+                    Debug.WriteLine(fileName);
 
-                    Profile newProfile=new Profile(ngramLength);
+                    Profile newProfile=new Profile(ngramLength, fileName);
                     newProfile.AddFile(fileName);
-                    profiles.Add(newProfile);
+                    profiles.Add(fileName, newProfile);
                 }
             }
+            if (unknownText == null){
+                Console.WriteLine("Укажите известный текст параметром --target=<имя>");
+                return;
+            }
 
+            Profile normalProfile = new Profile(ngramLength, "normal");
             foreach(var profile in profiles){
-                var topOccurencies = profile.NGramRawOccurencies.OrderByDescending(x=> x.Value).Take(topN);
-
-                foreach (var ngram in topOccurencies){
-                    Console.WriteLine(ngram);
-                }
+                normalProfile.AddFile(profile.Key);
             }
-                        
+
+//            foreach(var profile in profiles){
+//                Console.WriteLine(String.Format("{0}:\n\tпростая сумма:{1}\n\tнормированное:{2}\n\tненормированное:{3}",
+//                                                profile.Key,
+//                                                unknownText.GetSimpleDistance(profile.Value),
+//                                                unknownText.GetDistanceWithNormal(profile.Value,normalProfile),
+//                                                unknownText.GetDistanceWithoutNormal(profile.Value)));
+//
+//
+////                var topOccurencies = profile.Value.NGramProbability.OrderByDescending(x=> x.Value).Take(topN);
+////
+////                foreach (var ngram in topOccurencies){
+////                    Console.WriteLine(String.Format("{0} : {1} ({2})",
+////                                      ngram.Key,
+////                                      profile.Value.NGramRawOccurencies[ngram.Key],
+////                                      profile.Value.NGramProbability[ngram.Key]));
+////                }
+//            }
+
+            var others = profiles.Select(x=> x.Value);
+            var d1 = unknownText.GetDistancesWithNormal(others,normalProfile);
+            foreach(var distance in d1){
+                Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
+            }
+
+            var d2 = unknownText.GetSimpleDistances(others);
+            foreach(var distance in d2){
+                Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
+            }
 
         }
                                

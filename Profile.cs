@@ -17,31 +17,35 @@ namespace NGrams
         // по умолчанию принимаем все буквенные символы Юникода
         private const string DefaultMatchPattern = @"^\p{L}+$";
         private const int DefaultNGramLength = 3;
+        private Guid id;
 
         private List<string> _fileNames;
 
-        public Profile (int ngramLength, string matchPattern)
+        public Profile (int ngramLength, string matchPattern, string authorName)
         {
             MatchPattern = matchPattern;
             N = ngramLength;
+            AuthorName=authorName;
 
             _fileNames = new List<string>();
             NGramRawOccurencies = new Dictionary<string,int>();
             NGramProbability = new Dictionary<string,decimal>();
+
+            id = Guid.NewGuid();
         }
 
-        public Profile (int ngramLength)
-                 :this(ngramLength,DefaultMatchPattern)
+        public Profile (int ngramLength, string authorName)
+                 :this(ngramLength,DefaultMatchPattern,authorName)
         {
         }
 
-        public Profile (string matchPattern)
-                 :this(DefaultNGramLength,matchPattern)
+        public Profile (string matchPattern, string authorName)
+                 :this(DefaultNGramLength,matchPattern,authorName)
         {
         }
 
-        public Profile ()
-                 :this(DefaultNGramLength,DefaultMatchPattern)
+        public Profile (string authorName)
+                 :this(DefaultNGramLength,DefaultMatchPattern,authorName)
         {
         }
 
@@ -51,6 +55,8 @@ namespace NGrams
         public IEnumerable<string> FileNames {
             get { return _fileNames;}
         }
+
+        public string AuthorName{get; private set;}
 
         /// <summary>
         ///      Получает кол-во символов в каждой N-грамме
@@ -79,7 +85,12 @@ namespace NGrams
         public void AddFile(string fileName){
             Dictionary<string,int> ngrams = ParseFile(fileName);
 
-            NGramRawOccurencies.AddRange(ngrams);
+            foreach(var ngram in ngrams){
+                NGramRawOccurencies.AddOrUpdate(
+                    ngram.Key,
+                    ngram.Value,
+                    (key,oldValue)=> oldValue+ngram.Value );
+            }
 
             RecountProbabilities();
         }
@@ -130,7 +141,15 @@ namespace NGrams
                 }
             }
         }
-         
+
+        public override bool Equals (object obj)
+        {
+            Profile other = obj as Profile;
+
+            if (other != null){
+                return other.id.Equals(this.id);
+            }
+            return false;
+        }
     }
 }
-

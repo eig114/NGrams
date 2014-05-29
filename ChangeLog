@@ -1,3 +1,19 @@
+2014-05-29  eig  <eig114@gmail.com>
+
+	* ProfileExtensions.cs: Перенос и расширение функционала
+	  класса Profiler. 
+
+	* Settings.StyleCop: Настройки от StyleCop
+
+	* Main.cs:
+	* NGrams.pidb:
+	* NGrams.csproj: 
+
+	* Profile.cs: Поле с именем автора. Метод Equals
+
+	* Profiler.cs: Удалил Profiler. Весь функционал перенесен в
+	  ProfileExtensions
+
 2014-05-03  eig  <eig114@gmail.com>
 
 	* Profile.cs: Расширение NgramGetter. Профилирует автора по

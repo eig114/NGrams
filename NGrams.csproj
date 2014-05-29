@@ -44,9 +44,9 @@
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Extensions\IDictionaryExtensions.cs" />
-    <Compile Include="Profiler.cs" />
     <Compile Include="Profile.cs" />
     <Compile Include="Extensions\ICollectionExtensions.cs" />
+    <Compile Include="ProfileExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
