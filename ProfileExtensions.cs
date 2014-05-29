@@ -23,7 +23,7 @@ namespace NGrams
                 decimal freq2 = p2.NGramProbability.TryGetValue(ngramString, out freq)
                                         ? freq
                                         : 0;
-                return new KeyValuePair<string,decimal>(ngramString, GetDistance(freq1, freq2, ngram.Value));
+                return new KeyValuePair<string,decimal>(ngramString, GetNormalizedDistance(freq1, freq2, ngram.Value));
             }).ToDictionary(x => x.Key, y => y.Value);
 
             return distanceVector.Sum(x=> x.Value);
@@ -31,7 +31,21 @@ namespace NGrams
 
 
         public static decimal GetDistanceWithoutNormal(this Profile p1, Profile p2){
-            return 0;
+            var ngrams = p1.NGramProbability.Keys.Union(p2.NGramProbability.Keys);
+
+            decimal sum=0;
+            foreach(var ngram in ngrams){
+                decimal freq;
+                decimal freq1 = p1.NGramProbability.TryGetValue(ngram, out freq)
+                                        ? freq
+                                        : 0;
+                decimal freq2 = p2.NGramProbability.TryGetValue(ngram, out freq)
+                                        ? freq
+                                        : 0;
+                sum+=GetDistance(freq1, freq2);
+            }
+
+            return sum;
         }
 
         public static decimal GetSimpleDistance(this Profile p1, Profile p2){
@@ -112,7 +126,7 @@ namespace NGrams
         /// <param name='frequencyNormal'>
         /// Frequency normal.
         /// </param>
-        private static decimal GetDistance (
+        private static decimal GetNormalizedDistance (
                         decimal freq1,
                         decimal freq2,
                         decimal freqNorm)
@@ -130,6 +144,30 @@ namespace NGrams
                                 : 0;
                         
             return x * y;
+        }
+
+        /// <summary>
+        /// Получает расстояние между двумя частотами Н-грам
+        /// </summary>
+        /// <returns>
+        /// The distance.
+        /// </returns>
+        /// <param name='frequency1'>
+        /// Frequency1.
+        /// </param>
+        /// <param name='frequency2'>
+        /// Frequency2.
+        /// </param>
+        private static decimal GetDistance (
+                        decimal freq1,
+                        decimal freq2)
+        {
+            decimal sum = freq1 + freq2;
+                        
+            decimal x = sum != 0 
+                                ? 2 * (freq1 - freq2) / sum
+                                : 0;
+            return x*x;
         }
     }
 }

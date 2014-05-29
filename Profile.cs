@@ -151,5 +151,10 @@ namespace NGrams
             }
             return false;
         }
+
+        public override int GetHashCode ()
+        {
+            return id.GetHashCode ();
+        }
     }
 }

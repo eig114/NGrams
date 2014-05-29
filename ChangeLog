@@ -1,5 +1,15 @@
 2014-05-29  eig  <eig114@gmail.com>
 
+	* NGrams.pidb: 
+
+	* Profile.cs: * Функция GetHashCode()
+
+	* ProfileExtensions.cs: + Ненормированные расстояния
+
+	* Main.cs: * Мелкие правки
+
+2014-05-29  eig  <eig114@gmail.com>
+
 	* Main.cs:
 	* README.md: 
 

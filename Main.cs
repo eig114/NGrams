@@ -85,14 +85,22 @@ namespace NGrams
 ////                }
 //            }
 
+            Console.WriteLine("Нормированные расстояния");
             var others = profiles.Select(x=> x.Value);
             var d1 = unknownText.GetDistancesWithNormal(others,normalProfile);
             foreach(var distance in d1){
                 Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
             }
 
-            var d2 = unknownText.GetSimpleDistances(others);
+            Console.WriteLine("Ненормированные расстояния");
+            var d2 = unknownText.GetDistancesWithoutNormal(others);
             foreach(var distance in d2){
+                Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
+            }
+
+            Console.WriteLine("Простые суммы");
+            var d3 = unknownText.GetSimpleDistances(others);
+            foreach(var distance in d3){
                 Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
             }
 
@@ -112,9 +120,7 @@ namespace NGrams
             OperatingSystem os = Environment.OSVersion;
 
             if (os.Platform == PlatformID.Unix) {
-#if DEBUG
-                System.Diagnostics.Debug.WriteLine(@"I smell a penguin! Or is it an imp?...");
-#endif
+                Debug.WriteLine(@"I smell a penguin! Or is it an imp?...");
                 return input.Replace("~", System.Environment.GetEnvironmentVariable("$HOME"));
             }
             return input;
