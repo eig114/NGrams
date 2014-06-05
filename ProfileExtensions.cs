@@ -11,9 +11,8 @@ namespace NGrams
     {
 
         public static decimal GetDistanceWithNormal(this Profile p1, Profile p2, Profile normal){
-             Dictionary<string,decimal> distanceVector = normal.NGramProbability.Select(
-                                ngram =>
-            {
+            decimal sum=0;
+            foreach(var ngram in normal.NGramProbability){
                 string ngramString = ngram.Key;
 
                 decimal freq;
@@ -23,10 +22,10 @@ namespace NGrams
                 decimal freq2 = p2.NGramProbability.TryGetValue(ngramString, out freq)
                                         ? freq
                                         : 0;
-                return new KeyValuePair<string,decimal>(ngramString, GetNormalizedDistance(freq1, freq2, ngram.Value));
-            }).ToDictionary(x => x.Key, y => y.Value);
+                sum+=GetNormalizedDistance(freq1, freq2, ngram.Value);
+            }
+            return sum;
 
-            return distanceVector.Sum(x=> x.Value);
         }
 
 
@@ -49,7 +48,39 @@ namespace NGrams
         }
 
         public static decimal GetSimpleDistance(this Profile p1, Profile p2){
-            return p1.NGramRawOccurencies.Count(x => p2.NGramRawOccurencies.ContainsKey(x.Key));
+            return  p1.NGramRawOccurencies.Sum(x => {
+                int p2Occurencies=0;
+                if (p2.NGramRawOccurencies.TryGetValue(x.Key,out p2Occurencies)){
+                    return p2Occurencies;
+                }
+                return 0;
+            });
+        }
+
+        public static IDictionary<Profile,decimal> GetSimpleDistances(
+            this Profile p1,
+            IEnumerable<Profile> other)
+        {
+            Dictionary<Profile,decimal> result = new Dictionary<Profile, decimal>();
+            decimal sum=0;
+            foreach(var p2 in other){
+                decimal distance = p1.GetSimpleDistance(p2);
+                sum+=distance;
+                result.Add(p2,distance);
+            }
+
+            if (sum ==0){
+                result = result
+                .Select(x=> new KeyValuePair<Profile,decimal>(x.Key, 0))
+                .ToDictionary(x=> x.Key, y=> y.Value);
+            }
+            else{
+                result = result
+                .Select(x=> new KeyValuePair<Profile,decimal>(x.Key, x.Value/sum))
+                .ToDictionary(x=> x.Key, y=> y.Value);
+            }
+
+            return result;
         }
 
         public static IDictionary<Profile,decimal> GetDistancesWithNormal(
@@ -65,27 +96,9 @@ namespace NGrams
                 result.Add(p2,distance);
             }
 
+            decimal sum2 = result.Sum(x=> sum-x.Value);
             result = result
-                .Select(x=> new KeyValuePair<Profile,decimal>(x.Key, x.Value/sum))
-                .ToDictionary(x=> x.Key, y=> y.Value);
-
-            return result;
-        }
-
-        public static IDictionary<Profile,decimal> GetSimpleDistances(
-            this Profile p1,
-            IEnumerable<Profile> other)
-        {
-            Dictionary<Profile,decimal> result = new Dictionary<Profile, decimal>();
-            decimal sum=0;
-            foreach(var p2 in other){
-                decimal distance = p1.GetSimpleDistance(p2);
-                sum+=distance;
-                result.Add(p2,distance);
-            }
-
-            result = result
-                .Select(x=> new KeyValuePair<Profile,decimal>(x.Key, x.Value/sum))
+                .Select(x=> new KeyValuePair<Profile,decimal>(x.Key, (sum-x.Value) /sum2)) ///sum))
                 .ToDictionary(x=> x.Key, y=> y.Value);
 
             return result;
@@ -103,8 +116,9 @@ namespace NGrams
                 result.Add(p2,distance);
             }
 
+            decimal sum2 = result.Sum(x=> sum-x.Value);
             result = result
-                .Select(x=> new KeyValuePair<Profile,decimal>(x.Key, x.Value/sum))
+                .Select(x=> new KeyValuePair<Profile,decimal>(x.Key, (sum-x.Value) /sum2))///sum))
                 .ToDictionary(x=> x.Key, y=> y.Value);
 
             return result;
@@ -143,7 +157,7 @@ namespace NGrams
                                 ? 2 * (freq1 - freqNorm) / (freq1 + freqNorm)
                                 : 0;
                         
-            return x * y;
+            return Math.Abs(x * y);
         }
 
         /// <summary>
@@ -167,7 +181,7 @@ namespace NGrams
             decimal x = sum != 0 
                                 ? 2 * (freq1 - freq2) / sum
                                 : 0;
-            return x*x;
+            return Math.Abs(x*x);
         }
     }
 }

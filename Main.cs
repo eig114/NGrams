@@ -12,8 +12,13 @@ namespace NGrams
     class MainClass
     {
         private const int DefaultNgramLength = 3;
-        private const int DefaultTopN = 3;
-                
+        private const int DefaultTopN = 10;
+
+//        public static void Main (string[] args){
+//            //ngrams --target=1 ./2 ./3
+//            Main1(new[]{"--target=1", "2", "3", "4"});
+//        }
+
         /// <summary>
         /// The entry point of the program, where the program control starts and ends.
         /// </summary>
@@ -67,43 +72,36 @@ namespace NGrams
                 normalProfile.AddFile(profile.Key);
             }
 
-//            foreach(var profile in profiles){
-//                Console.WriteLine(String.Format("{0}:\n\tпростая сумма:{1}\n\tнормированное:{2}\n\tненормированное:{3}",
-//                                                profile.Key,
-//                                                unknownText.GetSimpleDistance(profile.Value),
-//                                                unknownText.GetDistanceWithNormal(profile.Value,normalProfile),
-//                                                unknownText.GetDistanceWithoutNormal(profile.Value)));
-//
-//
-////                var topOccurencies = profile.Value.NGramProbability.OrderByDescending(x=> x.Value).Take(topN);
-////
-////                foreach (var ngram in topOccurencies){
-////                    Console.WriteLine(String.Format("{0} : {1} ({2})",
-////                                      ngram.Key,
-////                                      profile.Value.NGramRawOccurencies[ngram.Key],
-////                                      profile.Value.NGramProbability[ngram.Key]));
-////                }
+//            foreach(var x in profiles){
+//                PrintTop(topN, x.Value);
 //            }
+//            PrintTop(topN, unknownText);
 
             Console.WriteLine("Нормированные расстояния");
             var others = profiles.Select(x=> x.Value);
-            var d1 = unknownText.GetDistancesWithNormal(others,normalProfile);
+            var d1 = unknownText.GetDistancesWithNormal(others,normalProfile).OrderByDescending(x=> x.Value);
             foreach(var distance in d1){
                 Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
             }
 
             Console.WriteLine("Ненормированные расстояния");
-            var d2 = unknownText.GetDistancesWithoutNormal(others);
+            var d2 = unknownText.GetDistancesWithoutNormal(others).OrderByDescending(x=> x.Value);
             foreach(var distance in d2){
                 Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
             }
 
             Console.WriteLine("Простые суммы");
-            var d3 = unknownText.GetSimpleDistances(others);
+            var d3 = unknownText.GetSimpleDistances(others).OrderByDescending(x=> x.Value);
             foreach(var distance in d3){
                 Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
             }
+        }
 
+        private static void PrintTop(int topN, Profile profile){
+            Console.WriteLine(profile.AuthorName);
+            foreach(var x in profile.NGramProbability.Take(topN)){
+                Console.WriteLine(x);
+            }
         }
                                
         /// <summary>

@@ -16,6 +16,7 @@ namespace NGrams
     {
         // по умолчанию принимаем все буквенные символы Юникода
         private const string DefaultMatchPattern = @"^\p{L}+$";
+        //private const string DefaultMatchPattern = @"^\p{L}|\s+$";
         private const int DefaultNGramLength = 3;
         private Guid id;
 
