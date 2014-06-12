@@ -6,13 +6,13 @@ using System.Text;
 using NGrams.Extensions;
 using System.Text.RegularExpressions;
 
-namespace NGrams
+namespace NGrams.Profiles
 {
  
     /// <summary>
     ///       Профиль автора.
     /// </summary>
-    public class Profile
+    public class NgramProfile:IProfile
     {
         // по умолчанию принимаем все буквенные символы Юникода
         private const string DefaultMatchPattern = @"^\p{L}+$";
@@ -22,30 +22,30 @@ namespace NGrams
 
         private List<string> _fileNames;
 
-        public Profile (int ngramLength, string matchPattern, string authorName)
+        public NgramProfile (int ngramLength, string matchPattern, string authorName)
         {
             MatchPattern = matchPattern;
             N = ngramLength;
             AuthorName=authorName;
 
             _fileNames = new List<string>();
-            NGramRawOccurencies = new Dictionary<string,int>();
-            NGramProbability = new Dictionary<string,decimal>();
+            RawOccurencies = new Dictionary<string,int>();
+            Probability = new Dictionary<string,decimal>();
 
             id = Guid.NewGuid();
         }
 
-        public Profile (int ngramLength, string authorName)
+        public NgramProfile (int ngramLength, string authorName)
                  :this(ngramLength,DefaultMatchPattern,authorName)
         {
         }
 
-        public Profile (string matchPattern, string authorName)
+        public NgramProfile (string matchPattern, string authorName)
                  :this(DefaultNGramLength,matchPattern,authorName)
         {
         }
 
-        public Profile (string authorName)
+        public NgramProfile (string authorName)
                  :this(DefaultNGramLength,DefaultMatchPattern,authorName)
         {
         }
@@ -72,12 +72,12 @@ namespace NGrams
         /// <summary>
         ///      Получает N-граммы и их количество во всех обработанных текстах.
         /// </summary>
-        public IDictionary<string,int> NGramRawOccurencies { get; private set; }
+        public IDictionary<string,int> RawOccurencies { get; private set; }
 
         /// <summary>
         ///     Получает частоту использования N-грамм
         /// </summary>
-        public IDictionary<string,decimal> NGramProbability { get; private set; }
+        public IDictionary<string,decimal> Probability { get; private set; }
 
         /// <summary>
         ///     Учитывает в профиле текст из файла <paramref name="fileName"/>
@@ -87,7 +87,7 @@ namespace NGrams
             Dictionary<string,int> ngrams = ParseFile(fileName);
 
             foreach(var ngram in ngrams){
-                NGramRawOccurencies.AddOrUpdate(
+                RawOccurencies.AddOrUpdate(
                     ngram.Key,
                     ngram.Value,
                     (key,oldValue)=> oldValue+ngram.Value );
@@ -100,8 +100,8 @@ namespace NGrams
         ///     Пересчитывает частоты использования N-грам в профиле.
         /// </summary>
         private void RecountProbabilities(){
-            int totalChars = NGramRawOccurencies.Sum(x => x.Value);
-            NGramProbability = NGramRawOccurencies
+            int totalChars = RawOccurencies.Sum(x => x.Value);
+            Probability = RawOccurencies
                                 .Select(x => new {
                                         Key = x.Key,
                                         Value = Decimal.Divide(x.Value, totalChars)})
@@ -145,7 +145,7 @@ namespace NGrams
 
         public override bool Equals (object obj)
         {
-            Profile other = obj as Profile;
+            NgramProfile other = obj as NgramProfile;
 
             if (other != null){
                 return other.id.Equals(this.id);

@@ -3,7 +3,7 @@ using System.Text;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using NGrams;
+using NGrams.Profiles;
 using NGrams.Extensions;
 using System.Diagnostics;
 
@@ -32,8 +32,8 @@ namespace NGrams
             int ngramLength = DefaultNgramLength;
             int topN = DefaultTopN;
                         
-            var profiles = new Dictionary<string,Profile>();
-            Profile unknownText=null;
+            var profiles = new Dictionary<string,NgramProfile>();
+            NgramProfile unknownText=null;
 
             foreach (string arg in args) {
                 if (arg.StartsWith("--n=")) {
@@ -50,14 +50,14 @@ namespace NGrams
                 }
                 else if (arg.StartsWith("--target=")){
                     string fileName=arg.Substring(9);
-                    unknownText=new Profile(ngramLength, "unknown");
+                    unknownText=new NgramProfile(ngramLength, "unknown");
                     unknownText.AddFile(fileName);
                 }
                 else {
                     string fileName = extendHome(arg);
                     Debug.WriteLine(fileName);
 
-                    Profile newProfile=new Profile(ngramLength, fileName);
+                    NgramProfile newProfile=new NgramProfile(ngramLength, fileName);
                     newProfile.AddFile(fileName);
                     profiles.Add(fileName, newProfile);
                 }
@@ -67,7 +67,7 @@ namespace NGrams
                 return;
             }
 
-            Profile normalProfile = new Profile(ngramLength, "normal");
+            NgramProfile normalProfile = new NgramProfile(ngramLength, "normal");
             foreach(var profile in profiles){
                 normalProfile.AddFile(profile.Key);
             }
@@ -97,9 +97,9 @@ namespace NGrams
             }
         }
 
-        private static void PrintTop(int topN, Profile profile){
+        private static void PrintTop(int topN, NgramProfile profile){
             Console.WriteLine(profile.AuthorName);
-            foreach(var x in profile.NGramProbability.Take(topN)){
+            foreach(var x in profile.Probability.Take(topN)){
                 Console.WriteLine(x);
             }
         }
