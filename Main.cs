@@ -12,26 +12,68 @@ namespace NGrams
     class MainClass
     {
         private const int DefaultNgramLength = 3;
-        private const int DefaultTopN = 10;
 
-//        public static void Main (string[] args){
-//            //ngrams --target=1 ./2 ./3
-//            Main1(new[]{"--target=1", "2", "3", "4"});
-//        }
+        public static void Main(string[] args){
+            Console.WriteLine("Определение по длине слов.");
+            WordLengthMain(args);
 
-        /// <summary>
-        /// The entry point of the program, where the program control starts and ends.
-        /// </summary>
-        /// <param name='args'>
-        /// Параметры командной строки. Запускается так: "ngrams [имя файла или параметр]*"
-        /// параметры: --n=VALUE - длина н-граммы, --top=VALUE кол-во отображаемых н-грам на файл
-        /// --target=TARGETNAME - имя файла с неизвестным текстом
-        /// </param>
-        public static void Main (string[] args)
+            Console.WriteLine("Определение по Nграмам.");
+            NgramMain(args);
+        }
+
+        public static void WordLengthMain(string[] args){
+            var profiles = new Dictionary<string,WordLengthProfile>();
+            WordLengthProfile unknownText=null;
+
+            foreach (string arg in args) {
+                if (arg.StartsWith("--target=")){
+                    string fileName=arg.Substring(9);
+                    unknownText=new WordLengthProfile("unknown");
+                    unknownText.AddFile(fileName);
+                }
+                else {
+                    string fileName = extendHome(arg);
+                    Debug.WriteLine(fileName);
+
+                    var newProfile=new WordLengthProfile(fileName);
+                    newProfile.AddFile(fileName);
+                    profiles.Add(fileName, newProfile);
+                }
+            }
+            if (unknownText == null){
+                Console.WriteLine("Укажите известный текст параметром --target=<имя>");
+                return;
+            }
+
+            WordLengthProfile normalProfile = new WordLengthProfile("normal");
+            foreach(var profile in profiles){
+                normalProfile.AddFile(profile.Key);
+            }
+
+            Console.WriteLine("Нормированные расстояния");
+            var others = profiles.Select(x=> x.Value);
+            var d1 = unknownText.GetDistancesWithNormal(others,normalProfile).OrderByDescending(x=> x.Value);
+            foreach(var distance in d1){
+                Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
+            }
+
+            Console.WriteLine("Ненормированные расстояния");
+            var d2 = unknownText.GetDistancesWithoutNormal(others).OrderByDescending(x=> x.Value);
+            foreach(var distance in d2){
+                Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
+            }
+
+            Console.WriteLine("Простые суммы");
+            var d3 = unknownText.GetSimpleDistances(others).OrderByDescending(x=> x.Value);
+            foreach(var distance in d3){
+                Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
+            }
+        }
+
+        public static void NgramMain (string[] args)
         {
             int ngramLength = DefaultNgramLength;
-            int topN = DefaultTopN;
-                        
+
             var profiles = new Dictionary<string,NgramProfile>();
             NgramProfile unknownText=null;
 
@@ -40,12 +82,6 @@ namespace NGrams
                     if (!Int32.TryParse(arg.Substring(4), out ngramLength)) {
                         Console.WriteLine("Параметр n должен быть целым числом.");
                         ngramLength = DefaultNgramLength;
-                    }
-                }
-                else if (arg.StartsWith("--top=")) {
-                    if (!Int32.TryParse(arg.Substring(6), out topN)) {
-                        Console.WriteLine("Количество отображаемых n-грам должно быть целым числом.");
-                        topN = DefaultTopN;
                     }
                 }
                 else if (arg.StartsWith("--target=")){
@@ -72,11 +108,6 @@ namespace NGrams
                 normalProfile.AddFile(profile.Key);
             }
 
-//            foreach(var x in profiles){
-//                PrintTop(topN, x.Value);
-//            }
-//            PrintTop(topN, unknownText);
-
             Console.WriteLine("Нормированные расстояния");
             var others = profiles.Select(x=> x.Value);
             var d1 = unknownText.GetDistancesWithNormal(others,normalProfile).OrderByDescending(x=> x.Value);
@@ -97,13 +128,6 @@ namespace NGrams
             }
         }
 
-        private static void PrintTop(int topN, NgramProfile profile){
-            Console.WriteLine(profile.AuthorName);
-            foreach(var x in profile.Probability.Take(topN)){
-                Console.WriteLine(x);
-            }
-        }
-                               
         /// <summary>
         ///     Разворачивает символ '~' в путь к домашней директории на UNIX'ах
         /// </summary>

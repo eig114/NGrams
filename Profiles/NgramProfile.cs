@@ -10,9 +10,9 @@ namespace NGrams.Profiles
 {
  
     /// <summary>
-    ///       Профиль автора.
+    ///       Профиль автора, учитывающий количество символьных сочетаний в качестве критерия
     /// </summary>
-    public class NgramProfile:IProfile
+    public class NgramProfile:IProfile<string>
     {
         // по умолчанию принимаем все буквенные символы Юникода
         private const string DefaultMatchPattern = @"^\p{L}+$";

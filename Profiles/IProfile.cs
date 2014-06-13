@@ -3,19 +3,25 @@ using System.Collections.Generic;
 
 namespace NGrams.Profiles
 {
-    public interface IProfile
+    /// <summary>
+    ///     Интерфейс профиля с произвольным критерием.
+    /// </summary>
+    public interface IProfile<Criteria>
     {
+        /// <summary>
+        /// Получает имя автора
+        /// </summary>
         string AuthorName{get;}
 
         /// <summary>
-        ///      Получает N-граммы и их количество во всех обработанных текстах.
+        ///      Получает значение критерия и его количество во всех обработанных текстах.
         /// </summary>
-        IDictionary<string,int> RawOccurencies { get; }
+        IDictionary<Criteria,int> RawOccurencies { get; }
 
         /// <summary>
-        ///     Получает частоту использования N-грамм
+        ///     Получает частоту использования значения критерия
         /// </summary>
-        IDictionary<string,decimal> Probability { get; }
+        IDictionary<Criteria,decimal> Probability { get; }
 
         /// <summary>
         ///     Учитывает в профиле текст из файла <paramref name="fileName"/>

@@ -11,10 +11,10 @@ namespace NGrams
     public static class ProfileExtensions
     {
 
-        public static decimal GetDistanceWithNormal(this IProfile p1, IProfile p2, IProfile normal){
+        public static decimal GetDistanceWithNormal<Criteria>(this IProfile<Criteria> p1, IProfile<Criteria> p2, IProfile<Criteria> normal){
             decimal sum=0;
             foreach(var ngram in normal.Probability){
-                string ngramString = ngram.Key;
+                Criteria ngramString = ngram.Key;
 
                 decimal freq;
                 decimal freq1 = p1.Probability.TryGetValue(ngramString, out freq)
@@ -30,7 +30,7 @@ namespace NGrams
         }
 
 
-        public static decimal GetDistanceWithoutNormal(this IProfile p1, IProfile p2){
+        public static decimal GetDistanceWithoutNormal<Criteria>(this IProfile<Criteria> p1, IProfile<Criteria> p2){
             var ngrams = p1.Probability.Keys.Union(p2.Probability.Keys);
 
             decimal sum=0;
@@ -48,7 +48,7 @@ namespace NGrams
             return sum;
         }
 
-        public static decimal GetSimpleDistance(this IProfile p1, IProfile p2){
+        public static decimal GetSimpleDistance<Criteria>(this IProfile<Criteria> p1, IProfile<Criteria> p2){
             return  p1.RawOccurencies.Sum(x => {
                 int p2Occurencies=0;
                 if (p2.RawOccurencies.TryGetValue(x.Key,out p2Occurencies)){
@@ -58,11 +58,11 @@ namespace NGrams
             });
         }
 
-        public static IDictionary<IProfile,decimal> GetSimpleDistances(
-            this IProfile p1,
-            IEnumerable<IProfile> other)
+        public static IDictionary<IProfile<Criteria>,decimal> GetSimpleDistances<Criteria>(
+            this IProfile<Criteria> p1,
+            IEnumerable<IProfile<Criteria>> other)
         {
-            Dictionary<IProfile,decimal> result = new Dictionary<IProfile, decimal>();
+            Dictionary<IProfile<Criteria>,decimal> result = new Dictionary<IProfile<Criteria>, decimal>();
             decimal sum=0;
             foreach(var p2 in other){
                 decimal distance = p1.GetSimpleDistance(p2);
@@ -72,24 +72,24 @@ namespace NGrams
 
             if (sum ==0){
                 result = result
-                .Select(x=> new KeyValuePair<IProfile,decimal>(x.Key, 0))
+                .Select(x=> new KeyValuePair<IProfile<Criteria>,decimal>(x.Key, 0))
                 .ToDictionary(x=> x.Key, y=> y.Value);
             }
             else{
                 result = result
-                .Select(x=> new KeyValuePair<IProfile,decimal>(x.Key, x.Value/sum))
+                .Select(x=> new KeyValuePair<IProfile<Criteria>,decimal>(x.Key, x.Value/sum))
                 .ToDictionary(x=> x.Key, y=> y.Value);
             }
 
             return result;
         }
 
-        public static IDictionary<IProfile,decimal> GetDistancesWithNormal(
-            this IProfile p1,
-            IEnumerable<IProfile> other,
-            IProfile normal)
+        public static IDictionary<IProfile<Criteria>,decimal> GetDistancesWithNormal<Criteria>(
+            this IProfile<Criteria> p1,
+            IEnumerable<IProfile<Criteria>> other,
+            IProfile<Criteria> normal)
         {
-            Dictionary<IProfile,decimal> result = new Dictionary<IProfile, decimal>();
+            Dictionary<IProfile<Criteria>,decimal> result = new Dictionary<IProfile<Criteria>, decimal>();
             decimal sum=0;
             foreach(var p2 in other){
                 decimal distance = p1.GetDistanceWithNormal(p2,normal);
@@ -99,17 +99,17 @@ namespace NGrams
 
             decimal sum2 = result.Sum(x=> sum-x.Value);
             result = result
-                .Select(x=> new KeyValuePair<IProfile,decimal>(x.Key, (sum-x.Value) /sum2)) ///sum))
+                .Select(x=> new KeyValuePair<IProfile<Criteria>,decimal>(x.Key, (sum-x.Value) /sum2)) ///sum))
                 .ToDictionary(x=> x.Key, y=> y.Value);
 
             return result;
         }
 
-        public static IDictionary<IProfile,decimal> GetDistancesWithoutNormal(
-            this IProfile p1,
-            IEnumerable<IProfile> other)
+        public static IDictionary<IProfile<Criteria>,decimal> GetDistancesWithoutNormal<Criteria>(
+            this IProfile<Criteria> p1,
+            IEnumerable<IProfile<Criteria>> other)
         {
-            Dictionary<IProfile,decimal> result = new Dictionary<IProfile, decimal>();
+            Dictionary<IProfile<Criteria>,decimal> result = new Dictionary<IProfile<Criteria>, decimal>();
             decimal sum=0;
             foreach(var p2 in other){
                 decimal distance = p1.GetDistanceWithoutNormal(p2);
@@ -119,7 +119,7 @@ namespace NGrams
 
             decimal sum2 = result.Sum(x=> sum-x.Value);
             result = result
-                .Select(x=> new KeyValuePair<IProfile,decimal>(x.Key, (sum-x.Value) /sum2))///sum))
+                .Select(x=> new KeyValuePair<IProfile<Criteria>,decimal>(x.Key, (sum-x.Value) /sum2))///sum))
                 .ToDictionary(x=> x.Key, y=> y.Value);
 
             return result;

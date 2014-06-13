@@ -1,0 +1,8 @@
+2014-06-13  eig  <eig114@gmail.com>
+
+	* WordLengthProfile.cs: Профиль по длине слова
+
+	* IProfile.cs: Обобщение понятия "профиль"
+
+	* NgramProfile.cs: 
+
