@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -47,6 +47,7 @@
     <Compile Include="Extensions\ICollectionExtensions.cs" />
     <Compile Include="Profiles\IProfile.cs" />
     <Compile Include="Profiles\NgramProfile.cs" />
+    <Compile Include="Profiles\ProfileBase.cs" />
     <Compile Include="Profiles\WordLengthProfile.cs" />
     <Compile Include="ProfileExtensions.cs" />
   </ItemGroup>
@@ -67,8 +68,5 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-    <Folder Include="Profiles\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>
