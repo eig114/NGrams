@@ -15,119 +15,80 @@ namespace NGrams
         private const int DefaultNgramLength = 3;
 
         public static void Main(string[] args){
-            Console.WriteLine("Определение по длине слов.");
-            WordLengthMain(args);
-
-            Console.WriteLine("Определение по Nграмам.");
-            NgramMain(args);
+			string targetName;
+	        if (GetTargetName(args, out targetName))
+	        {
+				Console.WriteLine("Определение по Nграмам.");
+				ProfileTest<NgramProfile, string>(args,targetName);
+				Console.WriteLine("Определение по длине слов.");
+				ProfileTest<WordLengthProfile, int>(args, targetName);
+	        }
+	        else
+	        {
+				Console.WriteLine("Укажите известный текст параметром --target=<имя>");
+	        }
         }
 
-        public static void WordLengthMain(string[] args){
-            var profiles = new Dictionary<string,WordLengthProfile>();
-            WordLengthProfile unknownText=null;
+	    private static bool GetTargetName(string[] consoleArgs, out string target)
+	    {
+			target = consoleArgs.FirstOrDefault(x => x.StartsWith("--target="));
+			if (target == default(string))
+		    {	
+			    return false;
+		    }
 
-            foreach (string arg in args) {
-                if (arg.StartsWith("--target=")){
-                    string fileName=arg.Substring(9);
-                    unknownText=new WordLengthProfile("unknown");
-                    unknownText.AddFile(fileName);
-                }
-                else {
-                    string fileName = extendHome(arg);
-                    Debug.WriteLine(fileName);
+		    return true;
+	    }
 
-                    var newProfile=new WordLengthProfile(fileName);
-                    newProfile.AddFile(fileName);
-                    profiles.Add(fileName, newProfile);
-                }
-            }
-            if (unknownText == null){
-                Console.WriteLine("Укажите известный текст параметром --target=<имя>");
-                return;
-            }
+	    private static void ProfileTest<TProfile, TCriteria>(string[] args, string targetFileName) where TProfile : class,IProfile<TCriteria>
+		{
+			var profiles = new Dictionary<string, TProfile>();
+			TProfile unknownText = null;
 
-            WordLengthProfile normalProfile = new WordLengthProfile("normal");
-            foreach(var profile in profiles){
-                normalProfile.AddFile(profile.Key);
-            }
+			foreach (string arg in args)
+			{
+				if (!arg.StartsWith("--")) // игнорим параметры
+				{
+					string fileName = extendHome(arg);
+					Debug.WriteLine(fileName);
 
-            Console.WriteLine("Нормированные расстояния");
-            var others = profiles.Select(x=> x.Value).ToArray();
-            var d1 = unknownText.GetDistancesWithNormal(others,normalProfile).OrderByDescending(x=> x.Value);
-            foreach(var distance in d1){
-                Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
-            }
+					var newProfile = ProfileFactory.GetProfile<TProfile, TCriteria>(fileName);
+					newProfile.AddFile(fileName);
+					profiles.Add(fileName, newProfile);	
+				}
+			}
 
-            Console.WriteLine("Ненормированные расстояния");
-            var d2 = unknownText.GetDistancesWithoutNormal(others).OrderByDescending(x=> x.Value);
-            foreach(var distance in d2){
-                Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
-            }
+			unknownText = ProfileFactory.GetProfile<TProfile, TCriteria>("unknown");
+			unknownText.AddFile(targetFileName);
 
-            Console.WriteLine("Простые суммы");
-            var d3 = unknownText.GetSimpleDistances(others).OrderByDescending(x=> x.Value);
-            foreach(var distance in d3){
-                Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
-            }
-        }
+			TProfile normalProfile = ProfileFactory.GetProfile<TProfile, TCriteria>("normal");
+			foreach (var profile in profiles)
+			{
+				normalProfile.AddFile(profile.Key);
+			}
 
-        public static void NgramMain (string[] args)
-        {
-            int ngramLength = DefaultNgramLength;
+			Console.WriteLine("Нормированные расстояния");
+			var others = profiles.Select(x => x.Value).ToArray();
+			var d1 = unknownText.GetDistancesWithNormal(others, normalProfile).OrderByDescending(x => x.Value);
+			foreach (var distance in d1)
+			{
+				Console.WriteLine("{0} - {1}", distance.Key.AuthorName, distance.Value);
+			}
 
-            var profiles = new Dictionary<string,NgramProfile>();
-            NgramProfile unknownText=null;
+			Console.WriteLine("Ненормированные расстояния");
+			var d2 = unknownText.GetDistancesWithoutNormal(others).OrderByDescending(x => x.Value);
+			foreach (var distance in d2)
+			{
+				Console.WriteLine("{0} - {1}", distance.Key.AuthorName, distance.Value);
+			}
 
-            foreach (string arg in args) {
-                if (arg.StartsWith("--n=")) {
-                    if (!Int32.TryParse(arg.Substring(4), out ngramLength)) {
-                        Console.WriteLine("Параметр n должен быть целым числом.");
-                        ngramLength = DefaultNgramLength;
-                    }
-                }
-                else if (arg.StartsWith("--target=")){
-                    string fileName=arg.Substring(9);
-                    unknownText=new NgramProfile(ngramLength, "unknown");
-                    unknownText.AddFile(fileName);
-                }
-                else {
-                    string fileName = extendHome(arg);
-                    Debug.WriteLine(fileName);
-
-                    NgramProfile newProfile=new NgramProfile(ngramLength, fileName);
-                    newProfile.AddFile(fileName);
-                    profiles.Add(fileName, newProfile);
-                }
-            }
-            if (unknownText == null){
-                Console.WriteLine("Укажите известный текст параметром --target=<имя>");
-                return;
-            }
-
-            NgramProfile normalProfile = new NgramProfile(ngramLength, "normal");
-            foreach(var profile in profiles){
-                normalProfile.AddFile(profile.Key);
-            }
-
-            Console.WriteLine("Нормированные расстояния");
-            var others = profiles.Select(x=> x.Value).ToArray();
-            var d1 = unknownText.GetDistancesWithNormal(others,normalProfile).OrderByDescending(x=> x.Value);
-            foreach(var distance in d1){
-                Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
-            }
-
-            Console.WriteLine("Ненормированные расстояния");
-            var d2 = unknownText.GetDistancesWithoutNormal(others).OrderByDescending(x=> x.Value);
-            foreach(var distance in d2){
-                Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
-            }
-
-            Console.WriteLine("Простые суммы");
-            var d3 = unknownText.GetSimpleDistances(others).OrderByDescending(x=> x.Value);
-            foreach(var distance in d3){
-                Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
-            }
-        }
+			Console.WriteLine("Простые суммы");
+			var d3 = unknownText.GetSimpleDistances(others).OrderByDescending(x => x.Value);
+			foreach (var distance in d3)
+			{
+				Console.WriteLine("{0} - {1}", distance.Key.AuthorName, distance.Value);
+			}
+	    }
 
         /// <summary>
         ///     Разворачивает символ '~' в путь к домашней директории на UNIX'ах

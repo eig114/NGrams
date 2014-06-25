@@ -42,7 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="DistanceCalculation\IDistanceFunction.cs" />
     <Compile Include="DistanceCalculation\MatsuitaDistance.cs" />
     <Compile Include="DistanceCalculation\NonNormalizedDistance.cs" />
     <Compile Include="DistanceCalculation\NormalizedDistance.cs" />
@@ -53,6 +52,7 @@
     <Compile Include="Profiles\IProfile.cs" />
     <Compile Include="Profiles\NgramProfile.cs" />
     <Compile Include="Profiles\ProfileBase.cs" />
+    <Compile Include="Profiles\ProfileFactory.cs" />
     <Compile Include="Profiles\WordLengthProfile.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
