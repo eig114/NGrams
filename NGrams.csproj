@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="DistanceCalculation\KolmogorovSmirnovDistance.cs" />
     <Compile Include="DistanceCalculation\MatsuitaDistance.cs" />
     <Compile Include="DistanceCalculation\NonNormalizedDistance.cs" />
     <Compile Include="DistanceCalculation\NormalizedDistance.cs" />

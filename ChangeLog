@@ -1,3 +1,7 @@
+2014-06-25  eig  <eig114@gmail.com>
+
+	* Main.cs: 
+
 2014-06-13  eig  <eig114@gmail.com>
 
 	* Main.cs: Очистка от старого параметра --top, добавление

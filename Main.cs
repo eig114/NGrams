@@ -23,7 +23,7 @@ namespace NGrams
 	        }
 	        else
 	        {
-				Console.WriteLine("Укажите известный текст параметром --target=<имя>");
+				Console.WriteLine("Укажите неизвестный текст параметром --target=<имя>");
 	        }
         }
 
@@ -39,7 +39,7 @@ namespace NGrams
 		    return true;
 	    }
 
-	    private static void ProfileTest<TProfile, TCriteria>(string[] args, string targetFileName) where TProfile : class,IProfile<TCriteria>
+	    private static void ProfileTest<TProfile, TCriteria>(string[] args, string targetFileName) where TProfile : class, IProfile<TCriteria>
 		{
 			var profiles = new Dictionary<string, TProfile>();
 			TProfile unknownText = null;
@@ -66,28 +66,47 @@ namespace NGrams
 				normalProfile.AddFile(profile.Key);
 			}
 
-			Console.WriteLine("Нормированные расстояния");
 			var others = profiles.Select(x => x.Value).ToArray();
-			var d1 = unknownText.GetDistancesWithNormal(others, normalProfile).OrderByDescending(x => x.Value);
-			foreach (var distance in d1)
+			
+			PrintDistances("Расстояние Матсуиты", MatsuitaDistance.GetMatsuitaDistances, unknownText, others);
+			PrintDistances("Ненормированное расстояние", NonNormalizedDistance.GetDistancesWithoutNormal, unknownText, others);
+			PrintDistances("Расстояние Колмогорова-Смирнова", KolmogorovSmirnovDistance.GetKolmogorovSmirnovDistances, unknownText, others);
+			PrintDistances("Нормированные расстояния", NormalizedDistance.GetDistancesWithNormal, unknownText, others, normalProfile);
+			PrintDistances("Простая сумма", SimpleDistance.GetSimpleDistances, unknownText, others);
+		}
+
+	    private static void PrintDistances<TCriteria, TDistanceType>(
+		    string distanceName,
+			Func<IProfile<TCriteria>, IEnumerable<IProfile<TCriteria>>, IDictionary<IProfile<TCriteria>, TDistanceType>> distanceFunc,
+			IProfile<TCriteria> p1,
+			IEnumerable<IProfile<TCriteria>> p2) 
+	    {
+		    Console.WriteLine(distanceName);
+			var d = distanceFunc(p1,p2).OrderByDescending(x => x.Value);
+			foreach (var distance in d)
 			{
 				Console.WriteLine("{0} - {1}", distance.Key.AuthorName, distance.Value);
 			}
 
-			Console.WriteLine("Ненормированные расстояния");
-			var d2 = unknownText.GetDistancesWithoutNormal(others).OrderByDescending(x => x.Value);
-			foreach (var distance in d2)
-			{
-				Console.WriteLine("{0} - {1}", distance.Key.AuthorName, distance.Value);
-			}
-
-			Console.WriteLine("Простые суммы");
-			var d3 = unknownText.GetSimpleDistances(others).OrderByDescending(x => x.Value);
-			foreach (var distance in d3)
-			{
-				Console.WriteLine("{0} - {1}", distance.Key.AuthorName, distance.Value);
-			}
+			Console.WriteLine();
 	    }
+
+		private static void PrintDistances<TCriteria, TDistanceType>(
+			string distanceName,
+			Func<IProfile<TCriteria>, IEnumerable<IProfile<TCriteria>>, IProfile<TCriteria>, IDictionary<IProfile<TCriteria>, TDistanceType>> distanceFunc,
+			IProfile<TCriteria> p1,
+			IEnumerable<IProfile<TCriteria>> p2,
+			IProfile<TCriteria> normal )
+		{
+			Console.WriteLine(distanceName);
+			var d = distanceFunc(p1, p2,normal).OrderByDescending(x => x.Value);
+			foreach (var distance in d)
+			{
+				Console.WriteLine("{0} - {1}", distance.Key.AuthorName, distance.Value);
+			}
+
+			Console.WriteLine();
+		}
 
         /// <summary>
         ///     Разворачивает символ '~' в путь к домашней директории на UNIX'ах

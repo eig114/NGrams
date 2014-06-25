@@ -19,7 +19,7 @@ namespace NGrams.Profiles
 			var constructor = typeof(TProfile).GetConstructor(new[] { typeof(string) });
 			if (constructor == default(ConstructorInfo))
 			{
-				throw new InvalidOperationException();
+				throw new InvalidOperationException("Профиль не содержит конструктор от имени автора");
 			}
 
 			return (TProfile)constructor.Invoke(new object[] { author });
