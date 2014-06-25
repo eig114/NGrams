@@ -5,6 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using NGrams.Profiles;
 using NGrams.Extensions;
+using NGrams.DistanceCalculation;
 using System.Diagnostics;
 
 namespace NGrams
@@ -51,7 +52,7 @@ namespace NGrams
             }
 
             Console.WriteLine("Нормированные расстояния");
-            var others = profiles.Select(x=> x.Value);
+            var others = profiles.Select(x=> x.Value).ToArray();
             var d1 = unknownText.GetDistancesWithNormal(others,normalProfile).OrderByDescending(x=> x.Value);
             foreach(var distance in d1){
                 Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));
@@ -109,7 +110,7 @@ namespace NGrams
             }
 
             Console.WriteLine("Нормированные расстояния");
-            var others = profiles.Select(x=> x.Value);
+            var others = profiles.Select(x=> x.Value).ToArray();
             var d1 = unknownText.GetDistancesWithNormal(others,normalProfile).OrderByDescending(x=> x.Value);
             foreach(var distance in d1){
                 Console.WriteLine(String.Format("{0} - {1}", distance.Key.AuthorName, distance.Value));

@@ -28,6 +28,12 @@ namespace NGrams.Profiles
 
 		public IDictionary<Criteria, int> RawOccurencies { get; private set; }
 
+		public int GetCriteriaOccurencyCount(Criteria c)
+		{
+            var first =  RawOccurencies.FirstOrDefault(x=> x.Key.Equals(c)).Value;
+            return first.Equals(default(int)) ? 0 : first;
+		}
+
 		public IDictionary<Criteria, decimal> Probability { get; private set; }
 
 		/// <summary>
@@ -36,6 +42,12 @@ namespace NGrams.Profiles
 		public IEnumerable<string> FileNames
 		{
 			get { return this._fileNames; }
+		}
+
+		public decimal GetCriteriaOccurencyFrequency(Criteria c)
+		{
+			var first = Probability.FirstOrDefault(x => x.Key.Equals(c)).Value;
+			return first.Equals(default(decimal)) ? 0 : first;
 		}
 
 		/// <summary>
