@@ -12,9 +12,7 @@ namespace NGrams
 {
     class MainClass
     {
-        private const int DefaultNgramLength = 3;
-
-        public static void Main(string[] args){
+	    public static void Main(string[] args){
 			string targetName;
 	        if (GetTargetName(args, out targetName))
 	        {
@@ -37,6 +35,7 @@ namespace NGrams
 			    return false;
 		    }
 
+		    target = target.Substring(9);
 		    return true;
 	    }
 
