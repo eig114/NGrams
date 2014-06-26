@@ -42,11 +42,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="DistanceCalculation\DistanceBase.cs" />
+    <Compile Include="DistanceCalculation\DistanceCalculator.cs" />
+    <Compile Include="DistanceCalculation\EuclideanDistance.cs" />
+    <Compile Include="DistanceCalculation\IDistance.cs" />
     <Compile Include="DistanceCalculation\KolmogorovSmirnovDistance.cs" />
-    <Compile Include="DistanceCalculation\MatsuitaDistance.cs" />
+    <Compile Include="DistanceCalculation\MatusitaDistance.cs" />
     <Compile Include="DistanceCalculation\NonNormalizedDistance.cs" />
-    <Compile Include="DistanceCalculation\NormalizedDistance.cs" />
-    <Compile Include="DistanceCalculation\SimpleDistance.cs" />
     <Compile Include="Extensions\IDictionaryExtensions.cs" />
     <Compile Include="Extensions\ICollectionExtensions.cs" />
     <Compile Include="Main.cs" />

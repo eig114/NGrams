@@ -1,16 +1,14 @@
 using System;
-using System.Text;
-using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using NGrams.Profiles;
-using NGrams.Extensions;
 using NGrams.DistanceCalculation;
 using System.Diagnostics;
 
 namespace NGrams
 {
-    class MainClass
+
+	class MainClass
     {
 	    public static void Main(string[] args){
 			string targetName;
@@ -67,15 +65,16 @@ namespace NGrams
 			}
 
 			var others = profiles.Select(x => x.Value).ToArray();
-			Console.WriteLine("прошло {0} секунд", MeasureAction(() => PrintDistances("Расстояние Матсуиты", MatsuitaDistance.GetMatsuitaDistances, unknownText, others)));
-			Console.WriteLine("прошло {0} секунд", MeasureAction(() => PrintDistances("Ненормированное расстояние", NonNormalizedDistance.GetDistancesWithoutNormal, unknownText, others)));
-			Console.WriteLine("прошло {0} секунд", MeasureAction(() => PrintDistances("Расстояние Колмогорова-Смирнова", KolmogorovSmirnovDistance.GetKolmogorovSmirnovDistances, unknownText, others)));
-			Console.WriteLine("прошло {0} секунд", MeasureAction(() => PrintDistances("Нормированные расстояния", NormalizedDistance.GetDistancesWithNormal, unknownText, others, normalProfile)));
-			Console.WriteLine("прошло {0} секунд", MeasureAction(() => PrintDistances("Простая сумма", SimpleDistance.GetSimpleDistances, unknownText, others)));
-			//PrintDistances("Ненормированное расстояние", NonNormalizedDistance.GetDistancesWithoutNormal, unknownText, others);
-			//PrintDistances("Расстояние Колмогорова-Смирнова", KolmogorovSmirnovDistance.GetKolmogorovSmirnovDistances, unknownText, others);
-			//PrintDistances("Нормированные расстояния", NormalizedDistance.GetDistancesWithNormal, unknownText, others, normalProfile);
-			//PrintDistances("Простая сумма", SimpleDistance.GetSimpleDistances, unknownText, others);
+			Console.WriteLine(
+				"прошло {0} секунд", 
+				MeasureAction(() => PrintDistances("Колмогоров-Смирнов", DistanceCalculator.GetRelativeDistances<TCriteria,KolmogorovSmirnovDistance>, unknownText, others)));
+			Console.WriteLine(
+				"прошло {0} секунд", 
+				MeasureAction(() => PrintDistances("L2 (Евклидово)", DistanceCalculator.GetRelativeDistances<TCriteria, EuclideanDistance>, unknownText, others)));
+			Console.WriteLine(
+				"прошло {0} секунд",
+				MeasureAction(() => PrintDistances("Матсуита", DistanceCalculator.GetRelativeDistances<TCriteria, MatusitaDistance>, unknownText, others)));
+
 		}
 
 	    private static TimeSpan MeasureAction(Action action)
@@ -88,34 +87,36 @@ namespace NGrams
 		    return watch.Elapsed;
 	    }
 
-	    private static void PrintDistances<TCriteria, TDistanceType>(
+	    private static void PrintDistances<TCriteria>(
 		    string distanceName,
-			Func<IProfile<TCriteria>, IEnumerable<IProfile<TCriteria>>, IDictionary<IProfile<TCriteria>, TDistanceType>> distanceFunc,
+			Func<IProfile<TCriteria>, IEnumerable<IProfile<TCriteria>>, IDictionary<IProfile<TCriteria>, double>> distanceFunc,
 			IProfile<TCriteria> p1,
-			IEnumerable<IProfile<TCriteria>> p2) 
+			IEnumerable<IProfile<TCriteria>> p2)
 	    {
 		    Console.WriteLine(distanceName);
 			var d = distanceFunc(p1,p2).OrderByDescending(x => x.Value);
+			double prev = d.First().Value;
 			foreach (var distance in d)
 			{
-				Console.WriteLine("{0} - {1}", distance.Key.AuthorName, distance.Value);
+				Console.WriteLine("{0} - {1}, delta={2}", distance.Key.AuthorName, distance.Value, distance.Value - prev);
 			}
 
 			Console.WriteLine();
 	    }
 
-		private static void PrintDistances<TCriteria, TDistanceType>(
+		private static void PrintDistances<TCriteria>(
 			string distanceName,
-			Func<IProfile<TCriteria>, IEnumerable<IProfile<TCriteria>>, IProfile<TCriteria>, IDictionary<IProfile<TCriteria>, TDistanceType>> distanceFunc,
+			Func<IProfile<TCriteria>, IEnumerable<IProfile<TCriteria>>, IProfile<TCriteria>, IDictionary<IProfile<TCriteria>, double>> distanceFunc,
 			IProfile<TCriteria> p1,
 			IEnumerable<IProfile<TCriteria>> p2,
 			IProfile<TCriteria> normal )
 		{
 			Console.WriteLine(distanceName);
 			var d = distanceFunc(p1, p2,normal).OrderByDescending(x => x.Value);
+			double prev = d.First().Value;
 			foreach (var distance in d)
 			{
-				Console.WriteLine("{0} - {1}", distance.Key.AuthorName, distance.Value);
+				Console.WriteLine("{0} - {1}, delta={2}", distance.Key.AuthorName, distance.Value, distance.Value - prev);
 			}
 
 			Console.WriteLine();
