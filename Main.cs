@@ -73,7 +73,10 @@ namespace NGrams
 				MeasureAction(() => PrintDistances("L2 (Евклидово)", DistanceCalculator.GetRelativeDistances<TCriteria, EuclideanDistance>, unknownText, others)));
 			Console.WriteLine(
 				"прошло {0} секунд",
-				MeasureAction(() => PrintDistances("Матсуита", DistanceCalculator.GetRelativeDistances<TCriteria, MatusitaDistance>, unknownText, others)));
+				MeasureAction(() => PrintDistances("Матусита", DistanceCalculator.GetRelativeDistances<TCriteria, MatusitaDistance>, unknownText, others)));
+			Console.WriteLine(
+				"прошло {0} секунд",
+				MeasureAction(() => PrintDistances("Ненормализов.", DistanceCalculator.GetRelativeDistances<TCriteria, NonNormalizedDistance>, unknownText, others)));
 
 		}
 

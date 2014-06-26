@@ -22,8 +22,8 @@ namespace NGrams.DistanceCalculation
 				decimal freq2 = profile2.Probability.TryGetValue(ngram, out freq)
 										? freq
 										: 0;
-				
-				decimal x = sum != 0
+
+				decimal x = (freq1 + freq2) != 0
 									? 2 * (freq1 - freq2) / (freq1 + freq2)
 									: 0;
 				sum+= Math.Abs(x * x);
