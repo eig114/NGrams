@@ -67,13 +67,26 @@ namespace NGrams
 			}
 
 			var others = profiles.Select(x => x.Value).ToArray();
-			
-			PrintDistances("Расстояние Матсуиты", MatsuitaDistance.GetMatsuitaDistances, unknownText, others);
-			PrintDistances("Ненормированное расстояние", NonNormalizedDistance.GetDistancesWithoutNormal, unknownText, others);
-			PrintDistances("Расстояние Колмогорова-Смирнова", KolmogorovSmirnovDistance.GetKolmogorovSmirnovDistances, unknownText, others);
-			PrintDistances("Нормированные расстояния", NormalizedDistance.GetDistancesWithNormal, unknownText, others, normalProfile);
-			PrintDistances("Простая сумма", SimpleDistance.GetSimpleDistances, unknownText, others);
+			Console.WriteLine("прошло {0} секунд", MeasureAction(() => PrintDistances("Расстояние Матсуиты", MatsuitaDistance.GetMatsuitaDistances, unknownText, others)));
+			Console.WriteLine("прошло {0} секунд", MeasureAction(() => PrintDistances("Ненормированное расстояние", NonNormalizedDistance.GetDistancesWithoutNormal, unknownText, others)));
+			Console.WriteLine("прошло {0} секунд", MeasureAction(() => PrintDistances("Расстояние Колмогорова-Смирнова", KolmogorovSmirnovDistance.GetKolmogorovSmirnovDistances, unknownText, others)));
+			Console.WriteLine("прошло {0} секунд", MeasureAction(() => PrintDistances("Нормированные расстояния", NormalizedDistance.GetDistancesWithNormal, unknownText, others, normalProfile)));
+			Console.WriteLine("прошло {0} секунд", MeasureAction(() => PrintDistances("Простая сумма", SimpleDistance.GetSimpleDistances, unknownText, others)));
+			//PrintDistances("Ненормированное расстояние", NonNormalizedDistance.GetDistancesWithoutNormal, unknownText, others);
+			//PrintDistances("Расстояние Колмогорова-Смирнова", KolmogorovSmirnovDistance.GetKolmogorovSmirnovDistances, unknownText, others);
+			//PrintDistances("Нормированные расстояния", NormalizedDistance.GetDistancesWithNormal, unknownText, others, normalProfile);
+			//PrintDistances("Простая сумма", SimpleDistance.GetSimpleDistances, unknownText, others);
 		}
+
+	    private static TimeSpan MeasureAction(Action action)
+	    {
+		    Stopwatch watch = new Stopwatch();
+			watch.Start();
+		    action();
+			watch.Stop();
+
+		    return watch.Elapsed;
+	    }
 
 	    private static void PrintDistances<TCriteria, TDistanceType>(
 		    string distanceName,

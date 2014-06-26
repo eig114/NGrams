@@ -30,8 +30,8 @@ namespace NGrams.Profiles
 
 		public int GetCriteriaOccurencyCount(Criteria c)
 		{
-            var first =  RawOccurencies.FirstOrDefault(x=> x.Key.Equals(c)).Value;
-            return first.Equals(default(int)) ? 0 : first;
+			int count;
+			return RawOccurencies.TryGetValue(c, out count) ? count : 0;
 		}
 
 		public IDictionary<Criteria, decimal> Probability { get; private set; }
@@ -46,8 +46,8 @@ namespace NGrams.Profiles
 
 		public decimal GetCriteriaOccurencyFrequency(Criteria c)
 		{
-			var first = Probability.FirstOrDefault(x => x.Key.Equals(c)).Value;
-			return first.Equals(default(decimal)) ? 0 : first;
+			decimal freq;
+			return Probability.TryGetValue(c, out freq) ? freq : 0;
 		}
 
 		/// <summary>
