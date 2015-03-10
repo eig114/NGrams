@@ -57,6 +57,7 @@
     <Compile Include="Profiles\ProfileBase.cs" />
     <Compile Include="Profiles\ProfileFactory.cs" />
     <Compile Include="Profiles\WordLengthProfile.cs" />
+    <Compile Include="DistanceCalculation\WaveHedgesDistance.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

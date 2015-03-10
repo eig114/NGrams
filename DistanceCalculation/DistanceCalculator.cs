@@ -6,7 +6,7 @@
 
 	public static class DistanceCalculator
 	{
-		public static double GetDistance2<TCriteria, TDistance>(this IProfile<TCriteria> p1, IProfile<TCriteria> p2) where  TDistance:IDistance,new()
+		public static double GetDistance<TCriteria, TDistance>(this IProfile<TCriteria> p1, IProfile<TCriteria> p2) where  TDistance:IDistance,new()
 		{
 			var distance = new TDistance();
 			return distance.GetDistance(p1, p2);
